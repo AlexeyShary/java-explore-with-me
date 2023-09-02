@@ -131,7 +131,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'yandex-praktikum/java-explore-with-me'
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: 'stat_svc'
           path: tests
 
       - name: Check and Build application
