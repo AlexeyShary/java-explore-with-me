@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class StatsController {
-    private final static String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private final StatsService statsService;
 
