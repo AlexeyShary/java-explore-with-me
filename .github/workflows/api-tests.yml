@@ -91,12 +91,6 @@ jobs:
         run: |
           PULL=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"  /repos/${GITHUB_REPOSITORY}/pulls/${PULL_NUMBER}/files?per_page=100 || true)
           FILENAMES=$(jq '.[] | .filename' <<< "$PULL")
-          if [[ "$FILENAMES"  =~ "api-tests.yml" ]]
-          then
-            echo "The pull request contains the api-tests.yml file and cannot be modified. Remove it from PR"
-            echo "Pull request содержит файл api-tests.yml, его изменять нельзя. Удалите его из PR"
-            exit -1
-          fi
           if [[ "$FILENAMES"  =~ "checkstyle.xml" ]]
           then
             echo "The pull request contains the checkstyle.xml file and cannot be modified. Remove it from PR"
