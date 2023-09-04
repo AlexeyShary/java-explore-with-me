@@ -1,18 +1,19 @@
 package ru.practicum.ewm.stats.dto;
 
-import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
 public class EndpointHitDto {
-    @NotNull
+    @NotBlank
     private String app;
-    @NotNull
+    @NotBlank
     private String uri;
-    @NotNull
+    @NotBlank
     private String ip;
-    @NotNull
+    @NotBlank
     private String timestamp;
 }
