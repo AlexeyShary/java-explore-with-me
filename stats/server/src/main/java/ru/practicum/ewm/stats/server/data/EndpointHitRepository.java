@@ -13,7 +13,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
             "AND ((:uris) IS NULL OR e.uri IN :uris) " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY hits DESC")
-    List<Object[]> findUniqueStats(LocalDateTime start, LocalDateTime end, List<String> uris);
+    List<ViewStatsProjection> findUniqueStats(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query("SELECT e.app AS app, e.uri AS uri, COUNT(e.ip) AS hits " +
             "FROM EndpointHit e " +
@@ -21,6 +21,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
             "AND ((:uris) IS NULL OR e.uri IN :uris) " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY hits DESC")
-    List<Object[]> findNotUniqueStats(LocalDateTime start, LocalDateTime end, List<String> uris);
+    List<ViewStatsProjection> findNotUniqueStats(LocalDateTime start, LocalDateTime end, List<String> uris);
+
 }
 
