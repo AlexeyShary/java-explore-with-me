@@ -1,4 +1,4 @@
-package ru.practicum.ewm.stats.server;
+package ru.practicum.ewm.stats.server.data;
 
 import ru.practicum.ewm.stats.dto.EndpointHitDto;
 
