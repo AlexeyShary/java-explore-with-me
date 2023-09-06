@@ -38,7 +38,6 @@ public class UserService {
 
     @Transactional
     public UserDto create(UserDto userDto) {
-        userDto.setId(null);
         return UserMapper.INSTANCE.toDto(userRepository.save(UserMapper.INSTANCE.fromDto(userDto)));
     }
 
