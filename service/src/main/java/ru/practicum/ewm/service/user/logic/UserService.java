@@ -23,15 +23,15 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserDto> get(List<Long> ids, int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
-        Page<User> userPage;
+        Page<User> page;
 
         if (ids != null && !ids.isEmpty()) {
-            userPage = userRepository.findAllByIdIn(ids, pageable);
+            page = userRepository.findAllByIdIn(ids, pageable);
         } else {
-            userPage = userRepository.findAll(pageable);
+            page = userRepository.findAll(pageable);
         }
 
-        return userPage.getContent().stream()
+        return page.getContent().stream()
                 .map(UserMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
@@ -49,6 +49,6 @@ public class UserService {
 
     private User findById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id="+ id +" was not found"));
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " was not found"));
     }
 }

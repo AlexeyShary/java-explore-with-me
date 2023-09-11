@@ -53,6 +53,6 @@ public class CategoryService {
 
     private Category findById(long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with id="+ id +" was not found"));
+                .orElseThrow(() -> new NotFoundException("Category with id=" + id + " was not found"));
     }
 }

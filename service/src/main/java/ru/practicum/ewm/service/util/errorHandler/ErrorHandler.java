@@ -6,6 +6,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.ewm.service.util.exception.BadRequestException;
+import ru.practicum.ewm.service.util.exception.ConflictException;
 import ru.practicum.ewm.service.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
@@ -13,8 +15,19 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class ErrorHandler {
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleBadRequestException(BadRequestException e) {
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .errorTimestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleNotFound(NotFoundException e) {
+    public ApiError handleNotFoundException(NotFoundException e) {
         return ApiError.builder()
                 .status(HttpStatus.NOT_FOUND)
                 .reason("The required object was not found.")
@@ -25,7 +38,18 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleDataIntegrityViolation(DataIntegrityViolationException e) {
+    public ApiError handleConflictException(ConflictException e) {
+        return ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .reason("For the requested operation the conditions are not met.")
+                .message(e.getMessage())
+                .errorTimestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Integrity constraint has been violated.")
@@ -36,7 +60,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleDataIntegrityViolation(BindException e) {
+    public ApiError handleBindException(BindException e) {
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Incorrectly made request.")
@@ -46,6 +70,8 @@ public class ErrorHandler {
                 .errorTimestamp(LocalDateTime.now())
                 .build();
     }
+
+    //TODO: uncomment 500 handler
 /*
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
