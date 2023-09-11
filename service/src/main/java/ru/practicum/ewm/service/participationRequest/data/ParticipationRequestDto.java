@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.ewm.service.util.UtilConstants;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,6 @@ public class ParticipationRequestDto {
     private Long event;
     private ParticipationRequestState status;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UtilConstants.DATETIME_FORMAT)
     private LocalDateTime created;
 }

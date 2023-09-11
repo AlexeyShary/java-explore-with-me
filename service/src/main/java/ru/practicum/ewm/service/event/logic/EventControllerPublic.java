@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.service.event.data.event.EventFullDto;
 import ru.practicum.ewm.service.event.data.event.EventShortDto;
+import ru.practicum.ewm.service.util.UtilConstants;
 import ru.practicum.ewm.service.util.exception.BadRequestException;
 
 import javax.validation.Valid;
@@ -16,16 +17,14 @@ import java.util.List;
 @RequestMapping(path = "/events")
 @RequiredArgsConstructor
 public class EventControllerPublic {
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
     private final EventService eventService;
 
     @GetMapping()
     public List<EventShortDto> getAll(@RequestParam(defaultValue = "") String text,
                                       @RequestParam(required = false) List<Long> categories,
-                                      @RequestParam(defaultValue = "true") boolean paid,
-                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATETIME_FORMAT) LocalDateTime rangeStart,
-                                      @RequestParam(required = false) @DateTimeFormat(pattern = DATETIME_FORMAT) LocalDateTime rangeEnd,
+                                      @RequestParam(required = false) Boolean paid,
+                                      @RequestParam(required = false) @DateTimeFormat(pattern = UtilConstants.DATETIME_FORMAT) LocalDateTime rangeStart,
+                                      @RequestParam(required = false) @DateTimeFormat(pattern = UtilConstants.DATETIME_FORMAT) LocalDateTime rangeEnd,
                                       @RequestParam(defaultValue = "false") boolean onlyAvailable,
                                       @RequestParam(defaultValue = "VIEWS") SortMode sort,
                                       @Valid @RequestParam(defaultValue = "0") @Min(0) int from,

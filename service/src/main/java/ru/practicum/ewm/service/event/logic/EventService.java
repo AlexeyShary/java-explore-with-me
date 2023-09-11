@@ -46,8 +46,13 @@ public class EventService {
                                             int size) {
         Pageable pageable = PageRequest.of(from, size);
 
-        List<Long> usersParam = (users != null && users.size() == 1 && users.get(0).equals(0L)) ? null : users;
-        List<Long> categoriesParam = (categories != null && categories.size() == 1 && categories.get(0).equals(0L)) ? null : categories;
+        if (users != null && users.size() == 1 && users.get(0).equals(0)) {
+            users = null;
+        }
+
+        if (categories != null && categories.size() == 1 && categories.get(0).equals(0)) {
+            categories = null;
+        }
 
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now();
@@ -57,7 +62,7 @@ public class EventService {
             rangeEnd = UtilConstants.getMaxDateTime();
         }
 
-        Page<Event> page = eventRepository.findAllByAdmin(usersParam, states, categoriesParam, rangeStart, rangeEnd, pageable);
+        Page<Event> page = eventRepository.findAllByAdmin(users, states, categories, rangeStart, rangeEnd, pageable);
 
         //TODO: add views
 
@@ -69,7 +74,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventShortDto> getAllByUserId(long userId, int from, int size) {
+    public List<EventShortDto> getAllByInitiator(long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
         Page<Event> page = eventRepository.findAllByInitiatorId(userId, pageable);
 
@@ -79,7 +84,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventFullDto getByUserIdAndEventId(long userId, long eventId) {
+    public EventFullDto getByIdByInitiator(long userId, long eventId) {
         Event event = findEventById(eventId);
         checkInitiator(userId, eventId, event.getInitiator().getId());
 
@@ -87,7 +92,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public List<ParticipationRequestDto> getRequestsByEventId(long userId, long eventId) {
+    public List<ParticipationRequestDto> getParticipationRequestsByInitiator(long userId, long eventId) {
         findUserById(userId);
         findEventById(eventId);
 
@@ -99,7 +104,7 @@ public class EventService {
     @Transactional(readOnly = true)
     public List<EventShortDto> getAllPublic(String text,
                                             List<Long> categories,
-                                            boolean paid,
+                                            Boolean paid,
                                             LocalDateTime rangeStart,
                                             LocalDateTime rangeEnd,
                                             boolean onlyAvailable,
@@ -107,6 +112,10 @@ public class EventService {
                                             int from,
                                             int size) {
         // TODO: Сохранить статистику
+
+        if (categories != null && categories.size() == 1 && categories.get(0).equals(0)) {
+            categories = null;
+        }
 
         if (rangeStart == null) {
             rangeStart = LocalDateTime.now();
@@ -116,11 +125,13 @@ public class EventService {
             rangeEnd = UtilConstants.getMaxDateTime();
         }
 
-        List<Long> categoriesParam = (categories != null && categories.size() == 1 && categories.get(0).equals(0L)) ? null : categories;
-        List<Event> eventList = eventRepository.getAllPublic(text, categoriesParam, paid, rangeStart, rangeEnd);
+        List<Event> eventList = eventRepository.getAllPublic(text, categories, paid, rangeStart, rangeEnd);
 
         if (onlyAvailable) {
-            // TODO: Отфильтровать по подтвержденным реквестам
+            eventList = eventList.stream()
+                    .filter(event -> event.getParticipantLimit().equals(0)
+                            || event.getParticipantLimit() < participationRequestRepository.countByEventIdAndStatus(event.getId(), ParticipationRequestState.CONFIRMED))
+                    .collect(Collectors.toList());
         }
 
         //TODO: add views
@@ -232,7 +243,7 @@ public class EventService {
         Optional.ofNullable(updateEventAdminRequest.getPaid()).ifPresent(event::setPaid);
         Optional.ofNullable(updateEventAdminRequest.getRequestModeration()).ifPresent(event::setRequestModeration);
 
-        if(updateEventAdminRequest.getStateAction() != null) {
+        if (updateEventAdminRequest.getStateAction() != null) {
             switch (updateEventAdminRequest.getStateAction()) {
                 case PUBLISH_EVENT:
                     event.setState(EventState.PUBLISHED);
@@ -250,7 +261,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventFullDto patchByUser(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
+    public EventFullDto patchByInitiator(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
         Event event = findEventById(eventId);
         checkInitiator(userId, eventId, event.getInitiator().getId());
 
@@ -296,9 +307,9 @@ public class EventService {
     }
 
     @Transactional
-    public EventRequestStatusUpdateResult patchEventRequests(@PathVariable long userId,
-                                                             @PathVariable long eventId,
-                                                             @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+    public EventRequestStatusUpdateResult patchParticipationRequestsByInitiator(@PathVariable long userId,
+                                                                                @PathVariable long eventId,
+                                                                                @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         findUserById(userId);
         Event event = findEventById(eventId);
 

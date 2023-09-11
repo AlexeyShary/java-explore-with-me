@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.service.participationRequest.data.ParticipationRequestDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

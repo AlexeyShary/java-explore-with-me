@@ -32,11 +32,11 @@ public class UserControllerAdmin {
 
         String[] domainParts = domain.split(".");
 
-        if(login.length() > 64) {
+        if (login.length() > 64) {
             throw new BadRequestException("Login is too long");
         }
 
-        for(String domainPart : domainParts) {
+        for (String domainPart : domainParts) {
             if (domainPart.length() > 64) {
                 throw new BadRequestException("Domain part is too long");
             }

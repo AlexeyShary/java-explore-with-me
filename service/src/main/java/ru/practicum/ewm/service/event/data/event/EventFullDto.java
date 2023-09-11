@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.practicum.ewm.service.category.data.CategoryDto;
 import ru.practicum.ewm.service.event.data.location.LocationDto;
 import ru.practicum.ewm.service.user.data.UserShortDto;
+import ru.practicum.ewm.service.util.UtilConstants;
 
 import java.time.LocalDateTime;
 
@@ -23,13 +24,13 @@ public class EventFullDto {
     private String description;
     private EventState state;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UtilConstants.DATETIME_FORMAT)
     private LocalDateTime eventDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UtilConstants.DATETIME_FORMAT)
     private LocalDateTime createdOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UtilConstants.DATETIME_FORMAT)
     private LocalDateTime publishedOn;
 
     private Integer participantLimit;

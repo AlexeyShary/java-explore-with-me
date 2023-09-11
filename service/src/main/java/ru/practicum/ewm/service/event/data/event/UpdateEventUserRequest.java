@@ -7,10 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.service.event.data.location.LocationDto;
+import ru.practicum.ewm.service.util.UtilConstants;
 
 import javax.validation.constraints.Future;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -33,7 +32,7 @@ public class UpdateEventUserRequest {
 
     @Future
     @JsonProperty("eventDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UtilConstants.DATETIME_FORMAT)
     private LocalDateTime eventTimestamp;
 
     private Integer participantLimit;

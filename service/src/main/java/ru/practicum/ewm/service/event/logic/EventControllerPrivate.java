@@ -20,19 +20,19 @@ public class EventControllerPrivate {
     public List<EventShortDto> getAll(@PathVariable long userId,
                                       @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
                                       @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
-        return eventService.getAllByUserId(userId, from, size);
+        return eventService.getAllByInitiator(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getById(@PathVariable long userId,
                                 @PathVariable long eventId) {
-        return eventService.getByUserIdAndEventId(userId, eventId);
+        return eventService.getByIdByInitiator(userId, eventId);
     }
 
     @GetMapping("/{eventId}/requests")
-    public List<ParticipationRequestDto> getRequestsByEventId(@PathVariable long userId,
-                                                              @PathVariable long eventId) {
-        return eventService.getRequestsByEventId(userId, eventId);
+    public List<ParticipationRequestDto> getParticipationRequestsByInitiator(@PathVariable long userId,
+                                                                             @PathVariable long eventId) {
+        return eventService.getParticipationRequestsByInitiator(userId, eventId);
     }
 
     @PostMapping
@@ -46,13 +46,13 @@ public class EventControllerPrivate {
     public EventFullDto patchEventInfo(@PathVariable long userId,
                                        @PathVariable long eventId,
                                        @Valid @RequestBody UpdateEventUserRequest updateEventUserRequest) {
-        return eventService.patchByUser(userId, eventId, updateEventUserRequest);
+        return eventService.patchByInitiator(userId, eventId, updateEventUserRequest);
     }
 
     @PatchMapping("/{eventId}/requests")
     public EventRequestStatusUpdateResult patchEventRequests(@PathVariable long userId,
                                                              @PathVariable long eventId,
                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        return eventService.patchEventRequests(userId, eventId, eventRequestStatusUpdateRequest);
+        return eventService.patchParticipationRequestsByInitiator(userId, eventId, eventRequestStatusUpdateRequest);
     }
 }
