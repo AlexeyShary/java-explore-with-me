@@ -1,6 +1,7 @@
 package ru.practicum.ewm.service.event.logic;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,12 @@ import ru.practicum.ewm.service.user.data.UserRepository;
 import ru.practicum.ewm.service.util.UtilConstants;
 import ru.practicum.ewm.service.util.exception.ConflictException;
 import ru.practicum.ewm.service.util.exception.NotFoundException;
+import ru.practicum.ewm.stats.client.StatsClient;
+import ru.practicum.ewm.stats.dto.EndpointHitDto;
+import ru.practicum.ewm.stats.dto.ViewStatsDto;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,6 +41,16 @@ public class EventService {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final ParticipationRequestRepository participationRequestRepository;
+
+    @Value("${STAT_SERVER_URL:http://localhost:9090}")
+    private String statClientUrl;
+
+    private StatsClient statsClient;
+
+    @PostConstruct
+    private void init() {
+        statsClient = new StatsClient(statClientUrl);
+    }
 
     @Transactional(readOnly = true)
     public List<EventFullDto> getAllByAdmin(List<Long> users,
@@ -64,11 +80,21 @@ public class EventService {
 
         Page<Event> page = eventRepository.findAllByAdmin(users, states, categories, rangeStart, rangeEnd, pageable);
 
-        //TODO: add views
+        List<String> eventUrls = page.getContent().stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
+
+        List<ViewStatsDto> viewStatsDtos = statsClient.getStats(rangeStart.format(UtilConstants.getDefaultDateTimeFormatter()),
+                rangeEnd.format(UtilConstants.getDefaultDateTimeFormatter()), eventUrls, true);
 
         return page.getContent().stream()
                 .map(EventMapper.INSTANCE::toFullDto)
-                .peek(dto -> dto.setViews(0L))
+                .peek(dto -> {
+                    Optional<ViewStatsDto> matchingStats = viewStatsDtos.stream()
+                            .filter(statsDto -> statsDto.getUri().equals("/events/" + dto.getId()))
+                            .findFirst();
+                    dto.setViews(matchingStats.map(ViewStatsDto::getHits).orElse(0L));
+                })
                 .peek(dto -> dto.setConfirmedRequests(participationRequestRepository.countByEventIdAndStatus(dto.getId(), ParticipationRequestState.CONFIRMED)))
                 .collect(Collectors.toList());
     }
@@ -110,8 +136,14 @@ public class EventService {
                                             boolean onlyAvailable,
                                             EventControllerPublic.SortMode sort,
                                             int from,
-                                            int size) {
-        // TODO: Сохранить статистику
+                                            int size,
+                                            HttpServletRequest request) {
+        statsClient.createEndpointHit(EndpointHitDto.builder()
+                .app("ewm")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .hitTimestamp(LocalDateTime.now())
+                .build());
 
         if (categories != null && categories.size() == 1 && categories.get(0).equals(0)) {
             categories = null;
@@ -134,11 +166,21 @@ public class EventService {
                     .collect(Collectors.toList());
         }
 
-        //TODO: add views
+        List<String> eventUrls = eventList.stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
+
+        List<ViewStatsDto> viewStatsDtos = statsClient.getStats(rangeStart.format(UtilConstants.getDefaultDateTimeFormatter()),
+                rangeEnd.format(UtilConstants.getDefaultDateTimeFormatter()), eventUrls, true);
 
         List<EventShortDto> eventShortDtoList = eventList.stream()
                 .map(EventMapper.INSTANCE::toShortDto)
-                .peek(dto -> dto.setViews(0L))
+                .peek(dto -> {
+                    Optional<ViewStatsDto> matchingStats = viewStatsDtos.stream()
+                            .filter(statsDto -> statsDto.getUri().equals("/events/" + dto.getId()))
+                            .findFirst();
+                    dto.setViews(matchingStats.map(ViewStatsDto::getHits).orElse(0L));
+                })
                 .peek(dto -> dto.setConfirmedRequests(participationRequestRepository.countByEventIdAndStatus(dto.getId(), ParticipationRequestState.CONFIRMED)))
                 .collect(Collectors.toList());
 
@@ -160,17 +202,27 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventFullDto getByIdPublic(long eventId) {
+    public EventFullDto getByIdPublic(long eventId, HttpServletRequest request) {
         Event event = findEventById(eventId);
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new NotFoundException("Event with id=" + eventId + " was not found");
         }
 
-        //TODO: views, stat
+        statsClient.createEndpointHit(EndpointHitDto.builder()
+                .app("ewm")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .hitTimestamp(LocalDateTime.now())
+                .build());
+
+        List<String> eventUrls = Collections.singletonList("/events/" + event.getId());
+
+        List<ViewStatsDto> viewStatsDtos = statsClient.getStats(UtilConstants.getMinDateTime().format(UtilConstants.getDefaultDateTimeFormatter()),
+                UtilConstants.getMaxDateTime().plusYears(1).format(UtilConstants.getDefaultDateTimeFormatter()), eventUrls, true);
 
         EventFullDto dto = EventMapper.INSTANCE.toFullDto(event);
-        dto.setViews(0L);
+        dto.setViews(viewStatsDtos.isEmpty() ? 0L : viewStatsDtos.get(0).getHits());
         dto.setConfirmedRequests(participationRequestRepository.countByEventIdAndStatus(dto.getId(), ParticipationRequestState.CONFIRMED));
 
         return dto;
@@ -208,7 +260,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventFullDto patchByAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+    public EventFullDto patchByAdmin(long eventId, EventUpdateAdminRequest updateEventAdminRequest) {
         Event event = findEventById(eventId);
 
         if (updateEventAdminRequest.getEventTimestamp() != null && LocalDateTime.now().plusHours(1).isAfter(updateEventAdminRequest.getEventTimestamp())) {
@@ -216,12 +268,12 @@ public class EventService {
         }
 
         if (updateEventAdminRequest.getStateAction() != null) {
-            if (updateEventAdminRequest.getStateAction().equals(UpdateEventAdminRequest.StateAction.PUBLISH_EVENT) &&
+            if (updateEventAdminRequest.getStateAction().equals(EventUpdateAdminRequest.StateAction.PUBLISH_EVENT) &&
                     !event.getState().equals(EventState.PENDING)) {
                 throw new ConflictException("Cannot publish the event because it's not in the right state: " + event.getState());
             }
 
-            if (updateEventAdminRequest.getStateAction().equals(UpdateEventAdminRequest.StateAction.REJECT_EVENT) &&
+            if (updateEventAdminRequest.getStateAction().equals(EventUpdateAdminRequest.StateAction.REJECT_EVENT) &&
                     event.getState().equals(EventState.PUBLISHED)) {
                 throw new ConflictException("Cannot reject the event because it's not in the right state: " + event.getState());
             }
@@ -261,7 +313,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventFullDto patchByInitiator(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
+    public EventFullDto patchByInitiator(long userId, long eventId, EventUpdateUserRequest updateEventUserRequest) {
         Event event = findEventById(eventId);
         checkInitiator(userId, eventId, event.getInitiator().getId());
 

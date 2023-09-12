@@ -8,6 +8,7 @@ import ru.practicum.ewm.service.event.data.event.EventShortDto;
 import ru.practicum.ewm.service.util.UtilConstants;
 import ru.practicum.ewm.service.util.exception.BadRequestException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
@@ -28,17 +29,19 @@ public class EventControllerPublic {
                                       @RequestParam(defaultValue = "false") boolean onlyAvailable,
                                       @RequestParam(defaultValue = "VIEWS") SortMode sort,
                                       @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
-                                      @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
+                                      @Valid @RequestParam(defaultValue = "10") @Min(1) int size,
+                                      HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Start date must be before end date");
         }
 
-        return eventService.getAllPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventService.getAllPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("{eventId}")
-    public EventFullDto getById(@PathVariable long eventId) {
-        return eventService.getByIdPublic(eventId);
+    public EventFullDto getById(@PathVariable long eventId,
+                                HttpServletRequest request) {
+        return eventService.getByIdPublic(eventId, request);
     }
 
     public enum SortMode {

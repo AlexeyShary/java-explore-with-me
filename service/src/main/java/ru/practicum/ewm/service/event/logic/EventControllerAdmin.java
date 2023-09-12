@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.service.event.data.event.EventFullDto;
 import ru.practicum.ewm.service.event.data.event.EventState;
-import ru.practicum.ewm.service.event.data.event.UpdateEventAdminRequest;
+import ru.practicum.ewm.service.event.data.event.EventUpdateAdminRequest;
 import ru.practicum.ewm.service.util.UtilConstants;
 
 import javax.validation.Valid;
@@ -32,7 +32,7 @@ public class EventControllerAdmin {
 
     @PatchMapping("/{eventId}")
     public EventFullDto patch(@PathVariable long eventId,
-                              @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
+                              @Valid @RequestBody EventUpdateAdminRequest updateEventAdminRequest) {
         return eventService.patchByAdmin(eventId, updateEventAdminRequest);
     }
 }

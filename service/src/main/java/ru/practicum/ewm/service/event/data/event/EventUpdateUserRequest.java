@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateEventUserRequest {
+public class EventUpdateUserRequest {
     private Long category;
     private LocationDto location;
 
