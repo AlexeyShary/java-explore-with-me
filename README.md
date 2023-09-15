@@ -23,10 +23,10 @@ https://github.com/AlexeyShary/java-explore-with-me/blob/main/ewm-main-service-s
 ## Data Schemas
 
 ### stats-server
-<center><img src="schema_service.png" alt="Stats Server Schema"></center>
+<div style="text-align: center;"><img src="schema_service.png" alt="Stats Server Schema"></div>
 
 ### service
-<center><img src="schema_stats.png" alt="Service Schema"></center>
+<div style="text-align: center;"><img src="schema_stats.png" alt="Service Schema"></div>
 
 ## Getting Started
 
@@ -41,4 +41,8 @@ To get started with ExploreWithMe, follow these steps:
 
 ### stats-server detached
 
+https://github.com/AlexeyShary/java-explore-with-me/blob/main-svc/Tests%20for%20detatched%20stats%20service.postman_collection.json
+
 ### main service + stats service
+
+https://github.com/AlexeyShary/java-explore-with-me/blob/main-svc/Test%20Explore%20With%20Me%20-%20Main%20service.postman_collection.json
