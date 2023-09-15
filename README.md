@@ -23,10 +23,15 @@ https://github.com/AlexeyShary/java-explore-with-me/blob/main/ewm-main-service-s
 ## Data Schemas
 
 ### stats-server
-<div style="text-align: center;"><img src="schema_service.png" alt="Stats Server Schema"></div>
+
+<p align="center">
+  <img src="schema_stats.png" alt="Stats Server Schema">
+</p>
 
 ### service
-<div style="text-align: center;"><img src="schema_stats.png" alt="Service Schema"></div>
+<p align="center">
+  <img src="schema_service.png" alt="Main Service Schema">
+</p>
 
 ## Getting Started
 
