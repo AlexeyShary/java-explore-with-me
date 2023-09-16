@@ -62,7 +62,7 @@ public class EventService {
                                             int size) {
         Pageable pageable = PageRequest.of(from, size);
 
-        if (users != null && users.size() == 1 && users.get(0).equals(0)) {
+        if (users != null && users.size() == 1 && users.get(0).equals(0L)) {
             users = null;
         }
 
@@ -145,7 +145,7 @@ public class EventService {
                 .hitTimestamp(LocalDateTime.now())
                 .build());
 
-        if (categories != null && categories.size() == 1 && categories.get(0).equals(0)) {
+        if (categories != null && categories.size() == 1 && categories.get(0).equals(0L)) {
             categories = null;
         }
 

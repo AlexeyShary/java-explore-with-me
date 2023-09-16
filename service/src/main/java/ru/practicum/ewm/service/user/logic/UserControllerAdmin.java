@@ -30,7 +30,7 @@ public class UserControllerAdmin {
         String login = parts[0];
         String domain = parts[1];
 
-        String[] domainParts = domain.split(".");
+        String[] domainParts = domain.split("\\.");
 
         if (login.length() > 64) {
             throw new BadRequestException("Login is too long");
