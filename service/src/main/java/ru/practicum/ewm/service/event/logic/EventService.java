@@ -66,7 +66,7 @@ public class EventService {
             users = null;
         }
 
-        if (categories != null && categories.size() == 1 && categories.get(0).equals(0)) {
+        if (categories != null && categories.size() == 1 && categories.get(0).equals(0L)) {
             categories = null;
         }
 
