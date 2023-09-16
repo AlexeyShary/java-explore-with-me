@@ -46,7 +46,7 @@ class EndpointHitRepositoryTest {
         createEndpointHit("App1", "/uri2", "1.1.1.3", LocalDateTime.now().minusMonths(1));
 
         assertThat(endpointHitRepository.findAll()).size().isEqualTo(12);
-   }
+    }
 
     @Test
     @Order(2)
