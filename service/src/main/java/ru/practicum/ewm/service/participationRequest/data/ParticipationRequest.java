@@ -19,7 +19,7 @@ public class ParticipationRequest {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "participation_request_requester_id")
+    @JoinColumn(name = "participation_request_user_id")
     private User requester;
 
     @ManyToOne

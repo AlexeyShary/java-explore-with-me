@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @DataJpaTest
 @Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(locations = "classpath:test-application.properties")
+@ActiveProfiles("test")
 class EndpointHitRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;

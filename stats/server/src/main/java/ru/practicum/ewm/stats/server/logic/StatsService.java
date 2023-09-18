@@ -1,8 +1,10 @@
 package ru.practicum.ewm.stats.server.logic;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.stats.dto.EndpointHitDto;
 import ru.practicum.ewm.stats.dto.ViewStatsDto;
 import ru.practicum.ewm.stats.server.data.EndpointHitMapper;
@@ -20,6 +22,12 @@ public class StatsService {
 
     @Transactional(readOnly = true)
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (end != null && start != null) {
+            if (!end.isAfter(start)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range");
+            }
+        }
+
         List<ViewStatsProjection> results;
 
         if (unique) {

@@ -20,7 +20,7 @@ public class Event {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "event_initiator_id")
+    @JoinColumn(name = "event_initiator_user_id")
     private User initiator;
 
     @ManyToOne
