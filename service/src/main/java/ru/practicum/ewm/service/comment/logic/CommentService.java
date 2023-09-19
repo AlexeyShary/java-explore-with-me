@@ -51,7 +51,7 @@ public class CommentService {
         findUserById(userId);
         Comment comment = findCommentById(commentId);
 
-        if(!comment.getUser().getId().equals(userId)) {
+        if (!comment.getUser().getId().equals(userId)) {
             throw new ForbiddenException("User id=" + userId + " not owner of Comment id=" + commentId);
         }
 
@@ -78,7 +78,7 @@ public class CommentService {
         findUserById(userId);
         Comment comment = findCommentById(commentId);
 
-        if(!comment.getUser().getId().equals(userId)) {
+        if (!comment.getUser().getId().equals(userId)) {
             throw new ForbiddenException("User id=" + userId + " not owner of Comment id=" + commentId);
         }
 

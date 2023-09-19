@@ -2,6 +2,10 @@
 
 ExploreWithMe is an application that allows users to share information about interesting events and find companions to participate in them.
 
+## Feature pull request
+
+https://github.com/AlexeyShary/java-explore-with-me/pull/7
+
 ## Modules
 
 1. **service**: The main application module.
