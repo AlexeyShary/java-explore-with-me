@@ -57,8 +57,6 @@ public class CommentService {
 
         Optional.ofNullable(updateRequest.getText()).ifPresent(comment::setText);
 
-        comment = commentRepository.save(comment);
-
         return CommentMapper.INSTANCE.toDto(comment);
     }
 
@@ -67,8 +65,6 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
 
         Optional.ofNullable(updateRequest.getText()).ifPresent(comment::setText);
-
-        comment = commentRepository.save(comment);
 
         return CommentMapper.INSTANCE.toDto(comment);
     }
